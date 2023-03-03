@@ -51,8 +51,26 @@ docker build -t openai-teams-bot .
 docker run -d -p 3978:3978 --env-file .env openai-teams-bot
 ```
 
-2. Send a message to your bot in Teams, and it should respond with a generated message
+2. Set the Message Endpoint in Azure Bot configuration
 
+3. Enable the Teams Channel
+![](img/teamschannel.png)
+
+
+4. Click "Open in Teams" then send a message to your bot in Teams, and it should respond with a generated message
+![](img/openinteams.png)
+
+## Reference
+
+For local testing in Teams channel, you can expose your localhost and set the exposed endpoint. For example:
+```
+npx localtunnel --port 3978
+```
+
+To retrieve the MicrosoftAppId and MicrosoftAppPassword, you can create a new Azure Bot Service: https://portal.azure.com/#create/Microsoft.AzureBot"
+
+MicrosoftAppId and MicrosoftAppPassword can be found from the Azure Bot Service configuration page.
+![](img/appid_pw.png)
 
 ## Contributing
 
