@@ -19,22 +19,28 @@ npm install
 
 3. Set up the environment variables in a `.env` file. You can copy the `.env.example` file and rename it to `.env`, then replace the placeholders with your own API key and bot token.
 
+Example .env:
 ```
 MicrosoftAppType=MultiTenant
-MicrosoftAppId=
-MicrosoftAppPassword=
-MicrosoftAppTenantId=
+MicrosoftAppId=<Your MicrosoftAppId>
+MicrosoftAppPassword=<Your MicrosoftAppPassword>
+MicrosoftAppTenantId=<Your MicrosoftAppTenantId>
 
-OPENAI_NAME=
-OPENAI_API_KEY=
-ENGINE=
-MAX_TOKENS=
-TEMPERATURE=
-FREQUENCY_PENALTY=
-PRESENCE_PENALTY=
-TOP_P=
-STOP=null
-PREPROMPT=
+OPENAI_NAME=<Your OPENAI_NAME>
+OPENAI_API_KEY=<Your OPENAI_API_KEY>
+ENGINE=gpt-35-turbo
+
+OPENAI_API_TYPE=azure
+OPENAI_API_VERSION=2022-12-01
+
+MAX_DIALOGUES=10
+MAX_TOKENS=400
+TEMPERATURE=1
+FREQUENCY_PENALTY=0
+PRESENCE_PENALTY=0
+TOP_P=0.95
+STOP='["<|im_end|>"]'
+PREPROMPT='You are a Office365 support assistant. You help the user to answer all Office365 related questions. You write in a friendly yet professional tone. If the question is not about Office365, respond by saying "I am sorry that I can only able to answer Office 365 related questions”'
 ```
 
 Make sure to keep the `.env` file private and do not commit it to version control.
@@ -43,7 +49,7 @@ Make sure to keep the `.env` file private and do not commit it to version contro
 
 1. Start the bot by running the following command:
 ```
-python bot.py
+npm start
 ```
 or in Docker
 ```
