@@ -27,18 +27,14 @@ class EchoBot extends ActivityHandler {
             console.log('USER: ' + user);
             const message = context.activity.text;
             if (USER_MESSAGE_HISTORY.has(user)) {
-                if (USER_MESSAGE_HISTORY.get(user).length >= 10) {
-                    USER_MESSAGE_HISTORY.get(user).shift();
-                }
                 USER_MESSAGE_HISTORY.get(user).push(`<|im_start|>user\n${message}\n<|im_end|>\n`);
-                
             } else {
                 USER_MESSAGE_HISTORY.set(user, [`<|im_start|>user\n${message}\n<|im_end|>\n`]);
             }
 
             // Set up the OpenAI API request
-            const prompt = `<|im_start|>system\n${process.env.PREPROMPT}\n<|im_end|>\n${USER_MESSAGE_HISTORY.get(user).join('\n')}<|im_start|>assistant\n`;
-            console.log(prompt)
+            const prompt = `<|im_start|>system\n${process.env.PREPROMPT}\n\n<|im_end|>\n${USER_MESSAGE_HISTORY.get(user).join('\n')}<|im_start|>assistant\n`;
+            // const prompt = `${process.env.PREPROMPT}\n${context.activity.text}\n\n`;
             const requestBody = {
                 prompt,
                 max_tokens: parseInt(process.env.MAX_TOKENS),
@@ -46,34 +42,36 @@ class EchoBot extends ActivityHandler {
                 frequency_penalty: parseInt(process.env.FREQUENCY_PENALTY),
                 presence_penalty: parseInt(process.env.PRESENCE_PENALTY),
                 top_p: parseInt(process.env.TOP_P),
-                best_of: 1,
+                // best_of: 1,
                 stop: JSON.parse(process.env.STOP).length > 0 ? JSON.parse(process.env.STOP) : null,
             };
             const apiKey = process.env.OPENAI_API_KEY;
             const apiUrl = `https://${process.env.OPENAI_NAME}.openai.azure.com/openai/deployments/${process.env.ENGINE}/completions?api-version=2022-12-01`;
-            const requestHeaders = {
+            const headers = {
                 'Content-Type': 'application/json',
                 'api-key': apiKey,
             };
 
             // Call the OpenAI API to generate a response
-            const requestOptions = {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
-                headers: requestHeaders,
-                body: requestBody,
-                redirect: 'follow'
-              };
+                headers,
+                body: JSON.stringify(requestBody),
+            });
 
-            const response = await fetch(apiUrl, requestOptions);
-            const choices = await response;
-            console.log(choices)
-            const replyText = choices[0].text.trim();
-
+            const { choices } = await response.json();
+            let replyText = choices[0].text.trim();
             USER_MESSAGE_HISTORY.get(user).push(`<|im_start|>assistant\n${replyText}\n<|im_end|>\n`);
-            console.log(`messages: ${USER_MESSAGE_HISTORY.get(user)}`);
+
+            console.log(`###\n${USER_MESSAGE_HISTORY.get(user).join('\n')}\n###\n`);
 
             // Send the response back to the user
             await context.sendActivity(MessageFactory.text(replyText, replyText));
+            if (USER_MESSAGE_HISTORY.get(user).length >= process.env.MAX_DIALOGUES) {
+                USER_MESSAGE_HISTORY.set(user, []);
+                const endConversationText = `Reach maximum dialogues: ${process.env.MAX_DIALOGUES}. This conversation has been reset.`;
+                await context.sendActivity(MessageFactory.text(endConversationText, endConversationText));
+            }
             // By calling next() you ensure that the next BotHandler is run.
             await next();
         });
