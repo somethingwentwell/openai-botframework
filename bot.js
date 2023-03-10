@@ -15,26 +15,30 @@ const dotenv = require('dotenv');
 const ENV_FILE = path.join(__dirname, '.env');
 console.log('OPENAI_API_KEY: ' + process.env.OPENAI_API_KEY);
 dotenv.config({ path: ENV_FILE });
-
+const USER_MESSAGE_HISTORY = new Map();
 
 class EchoBot extends ActivityHandler {
     constructor() {
         super();
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
         this.onMessage(async (context, next) => {
+
+            const user = context.activity.from.id;
+            console.log('USER: ' + user);
+            const message = context.activity.text;
+            if (USER_MESSAGE_HISTORY.has(user)) {
+                if (USER_MESSAGE_HISTORY.get(user).length >= 10) {
+                    USER_MESSAGE_HISTORY.get(user).shift();
+                }
+                USER_MESSAGE_HISTORY.get(user).push(`<|im_start|>user\n${message}\n<|im_end|>\n`);
+                
+            } else {
+                USER_MESSAGE_HISTORY.set(user, [`<|im_start|>user\n${message}\n<|im_end|>\n`]);
+            }
+
             // Set up the OpenAI API request
-            // const prompt = `${process.env.PREPROMPT}\n${context.activity.text}`;
-            // const requestBody = {
-            //     prompt,
-            //     max_tokens: parseInt(process.env.MAX_TOKENS),
-            //     temperature: parseInt(process.env.TEMPERATURE),
-            //     frequency_penalty: parseInt(process.env.FREQUENCY_PENALTY),
-            //     presence_penalty: parseInt(process.env.PRESENCE_PENALTY),
-            //     top_p: parseInt(process.env.TOP_P),
-            //     best_of: 1,
-            //     stop: JSON.parse(process.env.STOP),
-            // };
-            const prompt = `${process.env.PREPROMPT}\n${context.activity.text}\n\n`;
+            const prompt = `<|im_start|>system\n${process.env.PREPROMPT}\n<|im_end|>\n${USER_MESSAGE_HISTORY.get(user).join('\n')}<|im_start|>assistant\n`;
+            console.log(prompt)
             const requestBody = {
                 prompt,
                 max_tokens: parseInt(process.env.MAX_TOKENS),
@@ -47,19 +51,26 @@ class EchoBot extends ActivityHandler {
             };
             const apiKey = process.env.OPENAI_API_KEY;
             const apiUrl = `https://${process.env.OPENAI_NAME}.openai.azure.com/openai/deployments/${process.env.ENGINE}/completions?api-version=2022-12-01`;
-            const headers = {
+            const requestHeaders = {
                 'Content-Type': 'application/json',
                 'api-key': apiKey,
             };
 
             // Call the OpenAI API to generate a response
-            const response = await fetch(apiUrl, {
+            const requestOptions = {
                 method: 'POST',
-                headers,
-                body: JSON.stringify(requestBody),
-            });
-            const { choices } = await response.json();
+                headers: requestHeaders,
+                body: requestBody,
+                redirect: 'follow'
+              };
+
+            const response = await fetch(apiUrl, requestOptions);
+            const choices = await response;
+            console.log(choices)
             const replyText = choices[0].text.trim();
+
+            USER_MESSAGE_HISTORY.get(user).push(`<|im_start|>assistant\n${replyText}\n<|im_end|>\n`);
+            console.log(`messages: ${USER_MESSAGE_HISTORY.get(user)}`);
 
             // Send the response back to the user
             await context.sendActivity(MessageFactory.text(replyText, replyText));

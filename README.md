@@ -43,7 +43,7 @@ Make sure to keep the `.env` file private and do not commit it to version contro
 
 1. Start the bot by running the following command:
 ```
-python bot.py
+npm start
 ```
 or in Docker
 ```
