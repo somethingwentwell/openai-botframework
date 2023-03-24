@@ -13,7 +13,6 @@ if (parseInt(process.versions.node.split('.')[0]) >= 14) {
 const dotenv = require('dotenv');
 // Import required bot configuration.
 const ENV_FILE = path.join(__dirname, '.env');
-console.log('OPENAI_API_KEY: ' + process.env.OPENAI_API_KEY);
 dotenv.config({ path: ENV_FILE });
 
 
@@ -22,44 +21,26 @@ class EchoBot extends ActivityHandler {
         super();
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
         this.onMessage(async (context, next) => {
-            // Set up the OpenAI API request
-            // const prompt = `${process.env.PREPROMPT}\n${context.activity.text}`;
-            // const requestBody = {
-            //     prompt,
-            //     max_tokens: parseInt(process.env.MAX_TOKENS),
-            //     temperature: parseInt(process.env.TEMPERATURE),
-            //     frequency_penalty: parseInt(process.env.FREQUENCY_PENALTY),
-            //     presence_penalty: parseInt(process.env.PRESENCE_PENALTY),
-            //     top_p: parseInt(process.env.TOP_P),
-            //     best_of: 1,
-            //     stop: JSON.parse(process.env.STOP),
-            // };
-            const prompt = `${process.env.PREPROMPT}\n${context.activity.text}\n\n`;
+
             const requestBody = {
-                prompt,
-                max_tokens: parseInt(process.env.MAX_TOKENS),
-                temperature: parseInt(process.env.TEMPERATURE),
-                frequency_penalty: parseInt(process.env.FREQUENCY_PENALTY),
-                presence_penalty: parseInt(process.env.PRESENCE_PENALTY),
-                top_p: parseInt(process.env.TOP_P),
-                best_of: 1,
-                stop: JSON.parse(process.env.STOP).length > 0 ? JSON.parse(process.env.STOP) : null,
+                "id": context.activity.recipient.id,
+                "text": context.activity.text
             };
-            const apiKey = process.env.OPENAI_API_KEY;
-            const apiUrl = `https://${process.env.OPENAI_NAME}.openai.azure.com/openai/deployments/${process.env.ENGINE}/completions?api-version=2022-12-01`;
+            console.log(requestBody)
+            const apiUrl = process.env.LC_API_URL;
             const headers = {
-                'Content-Type': 'application/json',
-                'api-key': apiKey,
+                'Content-Type': 'application/json'
             };
 
             // Call the OpenAI API to generate a response
             const response = await fetch(apiUrl, {
                 method: 'POST',
-                headers,
+                headers: headers,
                 body: JSON.stringify(requestBody),
             });
-            const { choices } = await response.json();
-            const replyText = choices[0].text.trim();
+            const res = await response.json();
+            console.log(res)
+            const replyText = res.result.trim();
 
             // Send the response back to the user
             await context.sendActivity(MessageFactory.text(replyText, replyText));
