@@ -50,7 +50,7 @@ class EchoBot extends ActivityHandler {
 
         this.onMembersAdded(async (context, next) => {
             const membersAdded = context.activity.membersAdded;
-            const welcomeText = 'This is a bot that uses OpenAI to generate responses. Source code: https://github.com/somethingwentwell/openai-tgbot';
+            const welcomeText = 'This is a bot that uses OpenAI to generate responses. Source code: https://github.com/somethingwentwell/azure-openai-langchain-bot';
             for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id) {
                     await context.sendActivity(MessageFactory.text(welcomeText, welcomeText));
