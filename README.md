@@ -25,13 +25,13 @@ MicrosoftAppId=
 MicrosoftAppPassword=
 MicrosoftAppTenantId=
 
-- API_ENDPOINT=http://demo.insource.asia/api/v1/process/b2430af0-a8f9-4dba-84ed-be0ac3957f02
+API_ENDPOINT=http://demo.insource.asia/api/v1/process/b2430af0-a8f9-4dba-84ed-be0ac3957f02
 REQUEST_BODY='{"inputs": {"query":"<INPUT>"}, "tweaks": { "InSourcePostgresVectorRetriever-J75tm": {"collection_name": "TEST"}, "InSourceAzureChatOpenAI-0qZar": {}, "OpenAIEmbeddings-r8pK5": {}, "RetrievalQA-3WMJc": {}, "CombineDocsChain-1PHKn": {} }}'
 OUTPUT='result.result'
 ```
 
 - API_ENDPOINT: The endpoint of the InSource API. For example, `http://demo.insource.asia/api/v1/process/b2430af0-a8f9-4dba-84ed-be0ac3957f02`
-REQUEST_BODY: The request body of the InSource API. You need to use `<INPUT>` to locate the user input. For example, `{"inputs": {"query":"<INPUT>"}, "tweaks": { "InSourcePostgresVectorRetriever-J75tm": {"collection_name": "TEST"}, "InSourceAzureChatOpenAI-0qZar": {}, "OpenAIEmbeddings-r8pK5": {}, "RetrievalQA-3WMJc": {}, "CombineDocsChain-1PHKn": {} }}`
+- REQUEST_BODY: The request body of the InSource API. You need to use `<INPUT>` to locate the user input. For example, `{"inputs": {"query":"<INPUT>"}, "tweaks": { "InSourcePostgresVectorRetriever-J75tm": {"collection_name": "TEST"}, "InSourceAzureChatOpenAI-0qZar": {}, "OpenAIEmbeddings-r8pK5": {}, "RetrievalQA-3WMJc": {}, "CombineDocsChain-1PHKn": {} }}`
 - OUTPUT: The output value of the InSource API. For example, given the InSource response is 
 ```
 {
