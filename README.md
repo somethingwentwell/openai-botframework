@@ -25,17 +25,24 @@ MicrosoftAppId=
 MicrosoftAppPassword=
 MicrosoftAppTenantId=
 
-OPENAI_NAME=
-OPENAI_API_KEY=
-ENGINE=
-MAX_TOKENS=
-TEMPERATURE=
-FREQUENCY_PENALTY=
-PRESENCE_PENALTY=
-TOP_P=
-STOP=null
-PREPROMPT=
+- API_ENDPOINT=http://demo.insource.asia/api/v1/process/b2430af0-a8f9-4dba-84ed-be0ac3957f02
+REQUEST_BODY='{"inputs": {"query":"<INPUT>"}, "tweaks": { "InSourcePostgresVectorRetriever-J75tm": {"collection_name": "TEST"}, "InSourceAzureChatOpenAI-0qZar": {}, "OpenAIEmbeddings-r8pK5": {}, "RetrievalQA-3WMJc": {}, "CombineDocsChain-1PHKn": {} }}'
+OUTPUT='result.result'
 ```
+
+- API_ENDPOINT: The endpoint of the InSource API. For example, `http://demo.insource.asia/api/v1/process/b2430af0-a8f9-4dba-84ed-be0ac3957f02`
+REQUEST_BODY: The request body of the InSource API. You need to use `<INPUT>` to locate the user input. For example, `{"inputs": {"query":"<INPUT>"}, "tweaks": { "InSourcePostgresVectorRetriever-J75tm": {"collection_name": "TEST"}, "InSourceAzureChatOpenAI-0qZar": {}, "OpenAIEmbeddings-r8pK5": {}, "RetrievalQA-3WMJc": {}, "CombineDocsChain-1PHKn": {} }}`
+- OUTPUT: The output value of the InSource API. For example, given the InSource response is 
+```
+{
+    "result": {
+        "result": "Hello! How can I help you today?",
+        "total_tokens": 0
+    },
+    "session_id": null
+}
+```
+If you need "Hello! How can I help you today" as the bot reply, the OUTPUT is `result.result`
 
 Make sure to keep the `.env` file private and do not commit it to version control.
 
@@ -43,7 +50,7 @@ Make sure to keep the `.env` file private and do not commit it to version contro
 
 1. Start the bot by running the following command:
 ```
-python bot.py
+npm start
 ```
 or in Docker
 ```
